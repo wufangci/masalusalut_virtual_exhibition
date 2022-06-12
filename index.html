@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VR Exhibition</title>
+    <meta charset="utf-8" name="description" content="" />
+
+    <!-- aframe script -->
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1f00d0beadf87bad7d275c174616e048f8b573fc/dist/aframe-master.min.js"></script>
+
+    <!-- other component -->
+
+    <!-- 讓牆壁不會穿牆的套件，可以設定哪裡不能經過 https://github.com/donmccurdy/aframe-inspector-plugin-recast-->
+    <script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script>
+
+    <!-- aframe-extras 支援相機在各個裝置的前後左右走動 -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-text-geometry-component@0.5.1/dist/aframe-text-geometry-component.min.js"></script>
+    <script src="./js/aframe-room-component.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/colinfizgig/aframe_Components/components/camera-cube-env.js"></script>
+    <script src="./js/showInfo.js"></script>
+  </head>
+  <body>
+    <!-- inspector-plugin-recast	來自不會穿牆的套件  -->
+    <a-scene background="color: #545454" inspector-plugin-recast>
+      <a-asset>
+        <img id="snow-img-src" src="./assets/images/tjaljaking/02.jpeg" />
+        <!-- <img id="snow-img-src" src="./assets/images/alexandra-unsplash.jpg" /> -->
+        <img id="greenocean-img-src" src="./assets/images/tjaljaking/07.jpeg" />
+        <img id="sand-img-src" src="./assets/images/tjaljaking/04.jpeg" />
+        <img id="ocean-img-src" src="./assets/images/tjaljaking/06.jpeg" />
+        <img id="mountain-img-src" src="./assets/images/tjaljaking/01.jpeg" />
+        <img id="marble" src="./assets/textures/marble/marble06.jpg" />
+        <a-asset-item
+          id="helmet"
+          src="./assets/model/DamagedHelmet/DamagedHelmet.gltf"
+        >
+          <a-asset-item
+            id="walltextture"
+            src="./assets/textures/marble/TexturesCom_Wall_Stucco3_1x1_1K_ao.tiff"
+          ></a-asset-item>
+        </a-asset-item>
+        <a-asset-item id="bench" src="./assets/model/modern_bench/scene.gltf">
+        </a-asset-item>
+        <a-mixin
+          id="spot-light"
+          light="type:spot;
+						color:#E5D5A4;
+						intensity:0.2;
+						penumbra:1;
+						angle:15;"
+        >
+        </a-mixin>
+        <a-asset-item id="nav" src="./assets/model/navmesh.gltf"></a-asset-item>
+      </a-asset>
+
+      <a-gltf-model src="#nav" nav-mesh visible="false"> </a-gltf-model>
+      <!-- ambient light -->
+      <!-- <a-light id="amb" type="ambient" color="#9c9c9c" intensity="0.2">
+      </a-light> -->
+      <!-- directional light
+						 在直射光，增加物體陰影，並在物件上中加上 shadow
+						 light="cast-shadow:true" 
+			-->
+      <a-light
+        id="dir"
+        position="-1 2 -2"
+        type="directional"
+        color="white"
+        intensity="0.1"
+        light="cast-shadow:true"
+      >
+      </a-light>
+      <!-- heisphere light -->
+      <a-light
+        id="hemi"
+        type="hemisphere"
+        color="#D2D2D2"
+        ground-color="#9E9E9E"
+        position="0 11 -2"
+        intensity="0.9"
+      >
+      </a-light>
+      <!-- spot light -->
+      <a-entity
+        id="spot-snow"
+        mixin="spot-light"
+        position="-3 6 0"
+        light="target:#snow-img"
+      >
+      </a-entity>
+      <a-entity
+        id="spot-mountain"
+        mixin="spot-light"
+        position="-1 6 4"
+        light="target:#mountain-img;
+					cast-shadow:true"
+      >
+      </a-entity>
+      <a-entity
+        id="spot-ocean"
+        mixin="spot-light"
+        position="5 6 -2"
+        light="target:#ocean-img;"
+      >
+      </a-entity>
+      <a-entity
+        id="spot-sand"
+        mixin="spot-light"
+        position="5 6 2"
+        light="target:#sand-img;"
+      >
+      </a-entity>
+      <a-entity
+        id="spot-helmet"
+        mixin="spot-light"
+        position="2.5 3 -7.5"
+        light="target:#helmet-model;
+					cast-shadow:true"
+      >
+      </a-entity>
+
+      <!-- a-entity + material + geometry -->
+      <rw-room
+        id="main-room"
+        material="color: white"
+        length="12"
+        width="12"
+        height="5"
+        position="-5 0 -5"
+      >
+        <rw-wall
+          position="2 0 0"
+          src="#walltextture"
+          material="repeat: 5 5; metalness:0; roughness:0.5"
+        >
+          <!-- door-main -->
+          <rw-doorhole id="door-main"> </rw-doorhole>
+          <rw-doorlink
+            from="#door-main"
+            to="#door-second"
+            material="color:#CCC"
+            position="3 0 0"
+            width="3"
+            height="4"
+          >
+            <rw-sides></rw-sides>
+            <!-- <rw-floor></rw-floor> -->
+            <rw-ceiling></rw-ceiling>
+          </rw-doorlink>
+        </rw-wall>
+        <rw-wall> </rw-wall>
+        <rw-wall> </rw-wall>
+        <rw-wall> </rw-wall>
+      </rw-room>
+      <rw-room
+        id="second-room"
+        material="color: #C9C9C9"
+        length="5"
+        width="10"
+        height="5"
+        position="-5 0 -10.2"
+      >
+        <rw-wall></rw-wall>
+        <rw-wall></rw-wall>
+        <rw-wall>
+          <rw-doorhole id="door-second" height="4"> </rw-doorhole>
+        </rw-wall>
+        <rw-wall></rw-wall>
+      </rw-room>
+
+      <a-plane
+        id="floor"
+        rotation="-90 0 0"
+        width="30"
+        height="45"
+        src="#marble"
+        material="repeat: 5 5; metalness:0; roughness:0.5"
+        shadow
+      >
+      </a-plane>
+
+      <!-- title text -->
+
+      <a-text
+        id="walltitle"
+        position="2.7 2 -5"
+        rotation="0 0 0"
+        color="black"
+        value="Tjaljakin | masalusalut"
+        width="5"
+        shader="msdf"
+        font="https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/oswald/Oswald-Regular.json"
+      ></a-text>
+      <a-text
+        id="desc"
+        position="2.7 1.2 -5"
+        rotation="0 0 0"
+        color="black"
+        value="In its most general sense, the term world refers to the totality of entities, to the whole of reality or to everything that is. The nature of the world has been conceptualized differently in different fields. Some conceptions see the world as unique while others talk of a plurality of worlds. Some treat the world as one simple object while others analyze the world as a complex made up of many parts. In scientific cosmology the world or universe is commonly defined as the totality of all space and time; all that is, has been, and will be. Theories of modality, on the other hand, talk of possible worlds as complete and consistent ways how things could have been."
+        width="3.5"
+        wrap-count="80"
+        shader="msdf"
+        font="https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/oswald/Oswald-Regular.json"
+      ></a-text>
+
+      <a-text
+        id="walltitle2"
+        position="-4.99 2.2 5.5"
+        rotation="0 90 0"
+        color="black"
+        value="Tjaljakin | masalusalut"
+        width="5"
+        shader="msdf"
+        font="https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/oswald/Oswald-Regular.json"
+      ></a-text>
+      <a-text
+        id="desc2"
+        position="-4.99 1.4 5.5"
+        rotation="0 90 0"
+        color="black"
+        value="In its most general sense, the term world refers to the totality of entities, to the whole of reality or to everything that is. The nature of the world has been conceptualized differently in different fields. Some conceptions see the world as unique while others talk of a plurality of worlds. Some treat the world as one simple object while others analyze the world as a complex made up of many parts. In scientific cosmology the world or universe is commonly defined as the totality of all space and time; all that is, has been, and will be. Theories of modality, on the other hand, talk of possible worlds as complete and consistent ways how things could have been."
+        width="3.5"
+        wrap-count="80"
+        shader="msdf"
+        font="https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/oswald/Oswald-Regular.json"
+      ></a-text>
+
+      <!-- show objects -->
+      <a-cylinder
+        id="helmet-show"
+        position="2.5 0.1 -7.5"
+        rotation="0 -90 0"
+        height="0.2"
+        radius="0.5"
+        shadow
+      >
+        <!-- 
+				增加環境的光線跟反射
+				amera-cube-env="distance: 100000; 
+				resolution: 256" 
+			  -->
+        <a-gltf-model
+          id="helmet-model"
+          position="0 0.5 0"
+          scale="0.3 0.3 0.3"
+          src="#helmet"
+          camera-cube-env="distance: 100000; 
+					resolution: 256"
+        >
+        </a-gltf-model>
+      </a-cylinder>
+      <!-- directional light
+						 在直射光，增加物體陰影，並在物件上中加上 shadow
+						 light="cast-shadow:true" 
+			-->
+      <a-gltf-model
+        id="bench-model"
+        position="2.5 0 2"
+        scale="0.015 0.015 0.015"
+        src="#bench"
+        camera-cube-env="distance: 100000; 
+					resolution: 64"
+        shadow
+      >
+      </a-gltf-model>
+
+      <a-gltf-model
+        id="bench-model2"
+        position="0.5 0 2"
+        scale="0.015 0.015 0.015"
+        src="#bench"
+        camera-cube-env="distance: 100000; 
+        resolution: 64"
+        shadow
+      >
+      </a-gltf-model>
+
+      <!-- show images -->
+
+      <a-box
+        position="-4.99 2 0"
+        rotation="0 90 0"
+        depth="0.1"
+        height="2.1"
+        width="2.6"
+        color="#F2F2F2"
+        shadow
+      >
+        <a-image
+          id="snow-img"
+          position="0 0 0.06"
+          height="2"
+          width="2.5"
+          src="#snow-img-src"
+          material="shader:standard"
+          showInfo="title : picture title ; content: picture story ;"
+        >
+        </a-image>
+      </a-box>
+
+      <a-box
+        position="1 2 -2"
+        width="3.1"
+        height="2.1"
+        depth="0.1"
+        color="#F2F2F2"
+        shadow
+        showInfo="title : picture title ; content: picture story ;"
+      >
+        <a-image
+          id="greenocean-img"
+          position="0 0 0.06"
+          rotation="0 0 0"
+          height="2"
+          width="3"
+          src="#greenocean-img-src"
+        >
+        </a-image>
+      </a-box>
+
+      <a-box
+        position="6.99 2 1.5"
+        rotation="0 -90 0"
+        depth="0.1"
+        height="1.1"
+        width="1.9"
+        color="#F2F2F2"
+        shadow
+      >
+        <a-image
+          position="0 0  0.1"
+          id="sand-img"
+          height="1"
+          width="1.8"
+          src="#sand-img-src"
+          material="shader:standard"
+          showInfo="title : sand; content: sand;"
+        >
+        </a-image>
+      </a-box>
+      <a-box
+        position="6.99 2 -2.5"
+        rotation="0 -90 0"
+        height="1.1"
+        width="2.6"
+        depth="0.1"
+        color="#F2F2F2"
+        shadow
+        showInfo="title : ocean; content: ocean;"
+      >
+        <a-image
+          id="ocean-img"
+          position="0 0  0.1"
+          height="1"
+          width="2.5"
+          src="#ocean-img-src"
+          material="shader:standard"
+        >
+        </a-image>
+      </a-box>
+
+      <a-box
+        id="mountain-img-box"
+        position="-1 2 7"
+        width="2.1"
+        height="1.1"
+        depth="0.1"
+        color="#F2F2F2"
+        shadow
+      >
+        <a-image
+          id="mountain-img"
+          position="0 0 -0.051"
+          rotation="0 0 0"
+          height="1"
+          width="2"
+          src="#mountain-img-src"
+          material="shader:standard"
+        >
+        </a-image>
+      </a-box>
+
+      <!-- <a-text value="title" position="0  3 0"> fsdfjsdfosdofoi</a-text> -->
+
+      <!-- 
+			 a-camera 內建設定相機 : 請設定在最後面
+			 position 設定相機的起始位置
+			 fov	    設定相機的視線角度範圍，預設是 80 fov="80" 是給 vr的觀看 ， 45 度 適合網頁觀看 不會變形
+			 far      設定相機最遠可以照到哪裡
+			 near     設定最近可以看到哪裡
+			
+			-->
+      <!-- <a-camera position="0 1.6 5" fov="80" far="1000" near="0.1"></a-camera> -->
+
+      <!-- 可以支援相機前後左右移動的套件 
+				look-controls 可以根據人的方向移動
+				movement-controls    aframe-extras 套件提供可以根據各個裝置，前後走動
+			
+			-->
+      <!-- 
+				a-cursor 網頁中的準心，會出現一個點
+				cursor="rayOrigin: mouse;" 以網頁中的滑鼠，當作點擊的目標，需要使用滑鼠點擊可以這樣設定。 
+				raycaster="objects: .interactable" cursor 可以互動的物件 指定 class name，並且要掛在互動的物件上面 也要掛上相同的 class name 
+				visible="false" 預設關閉物件 
+			-->
+      <a-entity
+        id="rig"
+        position="0 0 5"
+        movement-controls="constrainToNavMesh: true"
+      >
+        <a-entity camera position="0 1.6 0" look-controls>
+          <!-- <a-cursor></a-cursor> -->
+          <!-- cursor 也可以寫成這樣  -->
+          <a-entity
+            cursor="rayOrigin: mouse;"
+            raycaster="objects: .interactable"
+          ></a-entity>
+          <a-plane
+            id="infocard"
+            position="0 0 -0.1"
+            color="black"
+            opacity="0.7"
+            visible="false"
+          >
+            <a-plane
+              position="0 0 0.01"
+              color="white "
+              width="0.07"
+              height="0.1"
+            >
+              <a-text
+                id="title"
+                value="title..."
+                width="0.1"
+                position="-0.0257 0.022 0.01"
+                shader="msdf"
+                font="https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/oswald/Oswald-Regular.json"
+              >
+              </a-text>
+              <a-text
+                id="content"
+                value="content...."
+                wrap-count="30"
+                width="0.03"
+                position="-0.025 0.02 0.01"
+                align="left"
+                color="black "
+                shader="msdf"
+                font="https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/oswald/Oswald-Regular.json"
+              >
+              </a-text>
+            </a-plane>
+          </a-plane>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+  <!-- <script src="https://unpkg.com/aframe-text-geometry-component@0.5.1/dist/aframe-text-geometry-component.min.js"></script> -->
+</html>
